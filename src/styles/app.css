@@ -540,10 +540,16 @@
 .detail__credit {
   margin: 0 0 4px;
   font-size: 12.5px;
+  /* キャストが長くて折り返っても、2行目が行頭に戻らず値の開始位置に揃う
+     （ぶら下げインデント。60pxのラベル幅+6pxの余白と合わせてある） */
+  padding-left: 66px;
+  text-indent: -66px;
 }
 .detail__credit span {
+  /* 固定幅だと "Director" が収まらず名前に被る。中身に合わせて伸びる列にする */
   display: inline-block;
-  width: 34px;
+  min-width: 60px;
+  margin-right: 6px;
   color: var(--muted);
   font-size: 11px;
 }
