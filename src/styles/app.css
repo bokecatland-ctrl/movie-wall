@@ -508,10 +508,52 @@
   padding-right: 350px;
 }
 
+/* 表紙が大きくなり、上部いっぱいに敷かれるようになったので、
+   下に何があっても常に見えて押せるよう丸いバッジにして浮かせる */
 .detail__close {
   position: absolute;
   top: 12px;
   right: 12px;
+  z-index: 2;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: rgba(10, 10, 11, 0.55);
+  border-radius: 50%;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.detail__close:hover {
+  color: #fff;
+  background: rgba(10, 10, 11, 0.8);
+}
+
+/* スマホの下シート限定。開いた本自体がシートの下に隠れて再タップできない
+   ことがあるので、常に触れる「つまみ」を上端に置いておく */
+.detail__handle {
+  display: none;
+}
+@media (max-width: 760px) {
+  .detail__handle {
+    display: block;
+    width: 100%;
+    padding: 10px 0 6px;
+    margin: -20px 0 10px;
+    background: none;
+    border: 0;
+  }
+  .detail__handle::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    margin: 0 auto;
+    border-radius: 999px;
+    background: var(--rule);
+  }
 }
 .detail__poster img {
   width: 100%;

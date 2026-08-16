@@ -24,6 +24,9 @@ export default function DetailPanel({ entry, onUpdate, onRemove, onClose }) {
 
   return (
     <aside className="detail" aria-label={`${entry.title} details`}>
+      {/* スマホではシートが棚の下側を覆ってしまい、開いた本自体を
+          もう一度タップできないことがある。常に触れる場所を上部に用意する */}
+      <button className="detail__handle" onClick={onClose} aria-label="Close" />
       <button className="icon-btn detail__close" onClick={onClose} aria-label="Close">
         ✕
       </button>
