@@ -1,0 +1,97 @@
+/* cinema-roadmap の theme.css を土台に、棚と星図のトークンを足したもの */
+@font-face {
+  font-family: 'Anton';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('/fonts/anton-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: block;
+  src: url('/fonts/oswald-latin.woff2') format('woff2');
+}
+
+:root {
+  --bg: #0a0a0b;
+  --bg2: #131316;
+  --fg: #f4f1eb;
+  --muted: #8f8b84;
+  --rule: #26262a;
+  --accent: #e11d22;
+  --frame: #ded9ce;
+  --danger: #e0503a;
+  --star: #f5c542;
+
+  /* 棚：ウォールナットの板と、上から当たる照明 */
+  --plank: #3a2a1d;
+  --plank-edge: #56412e;
+  --plank-shadow: rgba(0, 0, 0, 0.62);
+
+  /* 星図：夜空 */
+  --sky-far: #05060d;
+  --sky-near: #0d1226;
+  --sky-line: rgba(180, 200, 255, 0.28);
+
+  --font-display: 'Anton', 'Arial Narrow', Impact, sans-serif;
+  --font-cond: 'Oswald', 'Bahnschrift Condensed', 'Arial Narrow', sans-serif;
+  --font-jp: 'Yu Gothic UI', 'Yu Gothic', 'Meiryo', sans-serif;
+  --font-ui: 'Segoe UI', 'Yu Gothic UI', system-ui, sans-serif;
+
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+input,
+textarea,
+select {
+  font: inherit;
+  color: var(--fg);
+  background: var(--bg2);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* 引き出しや星の点灯は「動き」が主役なので、切っている人には出さない */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

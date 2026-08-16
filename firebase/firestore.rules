@@ -1,0 +1,15 @@
+// Firebaseコンソール → Firestore Database → ルール にこのまま貼って公開する。
+//
+// entries は users/{自分のuid}/entries/{entryId} の下にだけ置く設計。
+// 「自分のuidの下だけ、ログインしている本人だけ読み書きできる」の1行がすべて
+// （Supabaseで言うRLSポリシーに相当する）。
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/entries/{entryId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
