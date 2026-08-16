@@ -81,7 +81,7 @@ export default function Shelf({ entries, sort, onSortChange, selectedId, onSelec
 
         {entries.length === 0 && (
           <p className="empty">
-            棚は空です。右下の <strong>＋</strong> から1本目を入れてください。
+            The shelf is empty. Tap <strong>+</strong> below to add your first one.
           </p>
         )}
       </div>

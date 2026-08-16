@@ -14,8 +14,8 @@ import './styles/theme.css'
 import './styles/app.css'
 
 const VIEWS = [
-  { id: 'shelf', label: '棚' },
-  { id: 'sky', label: '星図' },
+  { id: 'shelf', label: 'Shelf' },
+  { id: 'sky', label: 'Sky' },
 ]
 
 export default function App() {
@@ -97,7 +97,7 @@ export default function App() {
       const list = Array.isArray(data) ? data : (data.entries ?? [])
       const n = await importEntries(list)
       setEntries(await listEntries())
-      setError(n ? `${n}件を読み込みました。` : '新しく足すものはありませんでした。')
+      setError(n ? `Imported ${n} ${n === 1 ? 'entry' : 'entries'}.` : 'Nothing new to add.')
     } catch (e) {
       setError(e.message)
     }
@@ -130,7 +130,7 @@ export default function App() {
             className="icon-btn"
             onClick={() => setMenuOpen((v) => !v)}
             aria-expanded={menuOpen}
-            aria-label="メニュー"
+            aria-label="Menu"
           >
             ⋯
           </button>
@@ -144,7 +144,7 @@ export default function App() {
                     setMenuOpen(false)
                   }}
                 >
-                  これまでを見る
+                  See stats
                 </button>
                 <button
                   onClick={() => {
@@ -152,12 +152,12 @@ export default function App() {
                     setMenuOpen(false)
                   }}
                 >
-                  JSONで書き出す
+                  Export JSON
                 </button>
-                <button onClick={() => fileRef.current.click()}>JSONを読み込む</button>
-                {hasFirebase && <button onClick={() => signOut(auth)}>ログアウト</button>}
+                <button onClick={() => fileRef.current.click()}>Import JSON</button>
+                {hasFirebase && <button onClick={() => signOut(auth)}>Log out</button>}
                 <p className="menu__note">
-                  保存先: {hasFirebase ? 'Firebase（端末をまたげます）' : 'このブラウザだけ'}
+                  Storage: {hasFirebase ? 'Firebase (synced across devices)' : 'This browser only'}
                 </p>
               </div>
             </>
@@ -175,13 +175,13 @@ export default function App() {
 
       {error && (
         <p className="notice notice--error notice--float" onClick={() => setError('')}>
-          {error}（タップで閉じる）
+          {error} (tap to dismiss)
         </p>
       )}
 
       <main className="stage">
         {loading ? (
-          <p className="empty">読み込み中…</p>
+          <p className="empty">Loading…</p>
         ) : view === 'shelf' ? (
           <Shelf
             entries={entries}
@@ -212,7 +212,7 @@ export default function App() {
         />
       )}
 
-      <button className="fab" onClick={() => setAdding(true)} aria-label="観た映画を追加">
+      <button className="fab" onClick={() => setAdding(true)} aria-label="Add a movie">
         ＋
       </button>
 

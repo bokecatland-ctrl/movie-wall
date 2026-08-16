@@ -32,7 +32,7 @@ export default function Auth() {
       let stored = window.localStorage.getItem(PENDING_KEY)
       if (!stored) {
         // 送信した端末と違うと分からないので、確認のためもう一度だけ聞く
-        stored = window.prompt('確認のため、送信したメールアドレスを入力してください')
+        stored = window.prompt('Please re-enter the email address you used to sign in')
       }
       if (!stored) {
         setCompleting(false)
@@ -69,20 +69,20 @@ export default function Auth() {
     }
   }
 
-  if (completing) return <div className="boot">ログイン中…</div>
+  if (completing) return <div className="boot">Signing in…</div>
 
   return (
     <div className="auth">
       <h1 className="auth__logo">MOVIE WALL</h1>
       {sent ? (
         <p className="auth__msg">
-          {email} にログイン用のリンクを送りました。
+          We sent a login link to {email}.
           <br />
-          メールを開いてリンクを押してください。
+          Open your email and click the link.
         </p>
       ) : (
         <form onSubmit={send} className="auth__form">
-          <label htmlFor="email">メールアドレス</label>
+          <label htmlFor="email">Email</label>
           <input
             id="email"
             type="email"
@@ -92,7 +92,7 @@ export default function Auth() {
             onChange={(e) => setEmail(e.target.value)}
           />
           <button className="primary" disabled={busy || !email.trim()}>
-            {busy ? '送信中…' : 'ログインリンクを送る'}
+            {busy ? 'Sending…' : 'Send login link'}
           </button>
           {error && <p className="notice notice--error">{error}</p>}
         </form>

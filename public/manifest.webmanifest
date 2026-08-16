@@ -1,13 +1,13 @@
 {
   "name": "movie wall",
   "short_name": "movie wall",
-  "description": "観た映画が棚に積み上がり、空に星として増えていく個人の記録",
+  "description": "A personal log of movies watched — stacking up on a shelf, lighting up as stars in the sky.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0b",
   "theme_color": "#0a0a0b",
   "orientation": "any",
-  "lang": "ja",
+  "lang": "en",
   "icons": [
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },

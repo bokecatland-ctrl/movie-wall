@@ -13,13 +13,13 @@ export async function proxyTmdb(searchParams, token) {
   if (!token || !token.trim()) {
     return {
       status: 500,
-      body: { error: 'サーバにTMDBのトークンが設定されていません（環境変数 TMDB_TOKEN）。' },
+      body: { error: 'The server has no TMDB token configured (env var TMDB_TOKEN).' },
     }
   }
 
   const path = searchParams.get('path')
   if (!path || !ALLOWED.some((re) => re.test(path))) {
-    return { status: 400, body: { error: `許可されていないパスです: ${path ?? '(なし)'}` } }
+    return { status: 400, body: { error: `Path not allowed: ${path ?? '(none)'}` } }
   }
 
   const url = new URL(API + path)
@@ -33,7 +33,7 @@ export async function proxyTmdb(searchParams, token) {
       headers: { Authorization: `Bearer ${token}`, accept: 'application/json' },
     })
   } catch {
-    return { status: 502, body: { error: 'TMDBに接続できませんでした。' } }
+    return { status: 502, body: { error: 'Could not reach TMDB.' } }
   }
 
   const body = await res.json().catch(() => ({}))

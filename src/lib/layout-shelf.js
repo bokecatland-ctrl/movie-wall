@@ -1,11 +1,11 @@
 import { hueKey } from './color.js'
 
 export const SORTS = [
-  { id: 'watched', label: '観た順' },
-  { id: 'year', label: '公開年' },
-  { id: 'rating', label: '★順' },
-  { id: 'director', label: '監督別' },
-  { id: 'color', label: '色順' },
+  { id: 'watched', label: 'Watched' },
+  { id: 'year', label: 'Year' },
+  { id: 'rating', label: 'Rating' },
+  { id: 'director', label: 'Director' },
+  { id: 'color', label: 'Color' },
 ]
 
 export const SPINE_GAP = 2
@@ -39,11 +39,11 @@ export function sortEntries(entries, sort) {
     case 'year':
       return list.sort((a, b) => (a.releaseYear ?? 0) - (b.releaseYear ?? 0) || byRating(a, b))
     case 'rating':
-      return list.sort((a, b) => byRating(a, b) || a.title.localeCompare(b.title, 'ja'))
+      return list.sort((a, b) => byRating(a, b) || a.title.localeCompare(b.title))
     case 'director':
       return list.sort(
         (a, b) =>
-          (a.director || 'ん').localeCompare(b.director || 'ん', 'ja') ||
+          (a.director || '￿').localeCompare(b.director || '￿') ||
           (a.releaseYear ?? 0) - (b.releaseYear ?? 0)
       )
     case 'color':

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { posterUrl } from '../lib/tmdb.js'
 import StarRating from './StarRating.jsx'
 
-const VENUE_LABEL = { theater: '劇場', home: '家', other: 'その他' }
+const VENUE_LABEL = { theater: 'Theater', home: 'Home', other: 'Other' }
 
 /** 棚と星図で共用する詳細。どちらから開いても同じものが出る */
 export default function DetailPanel({ entry, onUpdate, onRemove, onClose }) {
@@ -18,19 +18,19 @@ export default function DetailPanel({ entry, onUpdate, onRemove, onClose }) {
 
   const meta = [
     entry.releaseYear,
-    entry.runtime && `${entry.runtime}分`,
+    entry.runtime && `${entry.runtime} min`,
     VENUE_LABEL[entry.venue],
   ].filter(Boolean)
 
   return (
-    <aside className="detail" aria-label={`${entry.title} の詳細`}>
-      <button className="icon-btn detail__close" onClick={onClose} aria-label="閉じる">
+    <aside className="detail" aria-label={`${entry.title} details`}>
+      <button className="icon-btn detail__close" onClick={onClose} aria-label="Close">
         ✕
       </button>
 
       <div className="detail__poster">
         {entry.posterPath ? (
-          <img src={posterUrl(entry.posterPath, 'w342')} alt="" />
+          <img src={posterUrl(entry.posterPath, 'w500')} alt="" />
         ) : (
           <div className="result__noimg">NO IMAGE</div>
         )}
@@ -44,13 +44,13 @@ export default function DetailPanel({ entry, onUpdate, onRemove, onClose }) {
 
       {entry.director && (
         <p className="detail__credit">
-          <span>監督</span>
+          <span>Director</span>
           {entry.director}
         </p>
       )}
       {entry.castNames?.length > 0 && (
         <p className="detail__credit">
-          <span>出演</span>
+          <span>Cast</span>
           {entry.castNames.join(' / ')}
         </p>
       )}
@@ -63,13 +63,13 @@ export default function DetailPanel({ entry, onUpdate, onRemove, onClose }) {
       )}
 
       <div className="detail__block">
-        <label className="detail__label">評価</label>
+        <label className="detail__label">Rating</label>
         <StarRating value={entry.rating} onChange={(v) => onUpdate(entry.id, { rating: v })} size={30} />
       </div>
 
       <div className="detail__block">
         <label className="detail__label" htmlFor="watched-on">
-          観た日{entry.isRewatch && <em className="detail__rewatch">再鑑賞</em>}
+          Watched on{entry.isRewatch && <em className="detail__rewatch">Rewatch</em>}
         </label>
         <input
           id="watched-on"
@@ -81,7 +81,7 @@ export default function DetailPanel({ entry, onUpdate, onRemove, onClose }) {
 
       <div className="detail__block">
         <label className="detail__label" htmlFor="note">
-          ひとこと
+          Note
         </label>
         <textarea
           id="note"
@@ -96,17 +96,17 @@ export default function DetailPanel({ entry, onUpdate, onRemove, onClose }) {
       <div className="detail__foot">
         {confirming ? (
           <>
-            <span className="detail__warn">棚から抜きますか？</span>
+            <span className="detail__warn">Remove from the shelf?</span>
             <button className="danger" onClick={() => onRemove(entry.id)}>
-              抜く
+              Remove
             </button>
             <button className="ghost" onClick={() => setConfirming(false)}>
-              やめる
+              Cancel
             </button>
           </>
         ) : (
           <button className="ghost" onClick={() => setConfirming(true)}>
-            この記録を削除
+            Delete this entry
           </button>
         )}
       </div>

@@ -54,12 +54,14 @@ export default function GrowthBar({ entries }) {
     <div className="growth">
       <div className="growth__main">
         <span className="growth__count">{count}</span>
-        <span className="growth__unit">本</span>
+        <span className="growth__unit">films</span>
       </div>
       <div className="growth__side">
-        <span title="観た映画の上映時間の合計">積み上げた時間 {formatDuration(s.minutes)}</span>
+        <span title="Total runtime of everything you've watched">
+          Time logged: {formatDuration(s.minutes)}
+        </span>
         <span>
-          今年 {s.thisYear}
+          This year: {s.thisYear}
           {s.lastYear > 0 && (
             <em className={s.thisYear >= s.lastYear ? 'up' : 'down'}>
               {s.thisYear >= s.lastYear ? '▲' : '▼'}
@@ -67,7 +69,7 @@ export default function GrowthBar({ entries }) {
             </em>
           )}
         </span>
-        {s.avg != null && <span>平均 ★{s.avg.toFixed(2)}</span>}
+        {s.avg != null && <span>Average ★{s.avg.toFixed(2)}</span>}
       </div>
     </div>
   )

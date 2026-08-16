@@ -7,9 +7,9 @@ import StarRating from './StarRating.jsx'
 const today = () => new Date().toLocaleDateString('sv-SE')
 
 const VENUES = [
-  { id: 'theater', label: '劇場' },
-  { id: 'home', label: '家' },
-  { id: 'other', label: 'その他' },
+  { id: 'theater', label: 'Theater' },
+  { id: 'home', label: 'Home' },
+  { id: 'other', label: 'Other' },
 ]
 
 export default function AddFlow({ entries, onSave, onClose }) {
@@ -22,6 +22,7 @@ export default function AddFlow({ entries, onSave, onClose }) {
   const [busyId, setBusyId] = useState(null)
 
   const [picked, setPicked] = useState(null)
+  const [posterPath, setPosterPath] = useState(null)
   const [rating, setRating] = useState(null)
   const [watchedOn, setWatchedOn] = useState(today())
   const [venue, setVenue] = useState('theater')
@@ -62,6 +63,7 @@ export default function AddFlow({ entries, onSave, onClose }) {
     try {
       const detail = await fetchMovieEntry(tmdbId)
       setPicked(detail)
+      setPosterPath(detail.posterPath)
       setRating(null)
       setWatchedOn(today())
       setNote('')
@@ -80,13 +82,13 @@ export default function AddFlow({ entries, onSave, onClose }) {
     setSaving(true)
     setError('')
     try {
-      const spineColor = await extractSpineColor(picked.posterPath)
+      const spineColor = await extractSpineColor(posterPath)
       await onSave({
         tmdbId: picked.tmdbId,
         title: picked.title,
         originalTitle: picked.originalTitle,
         releaseYear: picked.releaseYear,
-        posterPath: picked.posterPath,
+        posterPath,
         runtime: picked.runtime,
         genres: picked.genres,
         director: picked.director,
@@ -106,15 +108,15 @@ export default function AddFlow({ entries, onSave, onClose }) {
   }
 
   return (
-    <div className="sheet" role="dialog" aria-modal="true" aria-label="観た映画を追加">
+    <div className="sheet" role="dialog" aria-modal="true" aria-label="Add a movie">
       <div className="sheet__backdrop" onClick={onClose} />
 
       <div className="sheet__body">
         {step === 'search' && (
           <>
             <div className="sheet__head">
-              <h2>観た映画を追加</h2>
-              <button className="icon-btn" onClick={onClose} aria-label="閉じる">
+              <h2>Add a movie</h2>
+              <button className="icon-btn" onClick={onClose} aria-label="Close">
                 ✕
               </button>
             </div>
@@ -124,12 +126,12 @@ export default function AddFlow({ entries, onSave, onClose }) {
                 ref={inputRef}
                 type="search"
                 value={query}
-                placeholder="タイトルで検索（日本語でも可・表示は英題）"
+                placeholder="Search by title"
                 onChange={(e) => setQuery(e.target.value)}
                 enterKeyHint="search"
               />
               <button type="submit" disabled={loading || !query.trim()}>
-                {loading ? '…' : '検索'}
+                {loading ? '…' : 'Search'}
               </button>
             </form>
 
@@ -149,18 +151,18 @@ export default function AddFlow({ entries, onSave, onClose }) {
                     <div className="result__noimg">NO IMAGE</div>
                   )}
                   <div className="result__label">
-                    {busyId === r.tmdbId ? '読み込み中…' : r.title}
+                    {busyId === r.tmdbId ? 'Loading…' : r.title}
                   </div>
                   {r.year && <div className="result__year">{r.year}</div>}
                   {entries.some((e) => e.tmdbId === r.tmdbId) && (
-                    <div className="result__seen">記録済み</div>
+                    <div className="result__seen">Logged</div>
                   )}
                 </button>
               ))}
             </div>
 
             {searched && !loading && results.length === 0 && !error && (
-              <p className="notice">該当なし。原題（英語）でも試してみてください。</p>
+              <p className="notice">No results. Try the original title.</p>
             )}
           </>
         )}
@@ -168,32 +170,48 @@ export default function AddFlow({ entries, onSave, onClose }) {
         {step === 'rate' && picked && (
           <>
             <div className="sheet__head">
-              <button className="icon-btn" onClick={() => setStep('search')} aria-label="検索に戻る">
+              <button className="icon-btn" onClick={() => setStep('search')} aria-label="Back to search">
                 ←
               </button>
-              <h2>どうだった？</h2>
-              <button className="icon-btn" onClick={onClose} aria-label="閉じる">
+              <h2>How was it?</h2>
+              <button className="icon-btn" onClick={onClose} aria-label="Close">
                 ✕
               </button>
             </div>
 
             <div className="rate">
               <div className="rate__poster">
-                {picked.posterPath ? (
-                  <img src={posterUrl(picked.posterPath, 'w342')} alt="" />
+                {posterPath ? (
+                  <img src={posterUrl(posterPath, 'w342')} alt="" />
                 ) : (
                   <div className="result__noimg">NO IMAGE</div>
+                )}
+
+                {picked.posterCandidates?.length > 1 && (
+                  <div className="poster-picker">
+                    {picked.posterCandidates.map((p) => (
+                      <button
+                        key={p}
+                        type="button"
+                        className={`poster-picker__item${p === posterPath ? ' poster-picker__item--on' : ''}`}
+                        onClick={() => setPosterPath(p)}
+                        aria-label="Use this poster"
+                      >
+                        <img src={posterUrl(p, 'w154')} alt="" loading="lazy" />
+                      </button>
+                    ))}
+                  </div>
                 )}
               </div>
 
               <div className="rate__main">
                 <div className="rate__title">{picked.title}</div>
                 <div className="rate__meta">
-                  {[picked.releaseYear, picked.director, picked.runtime && `${picked.runtime}分`]
+                  {[picked.releaseYear, picked.director, picked.runtime && `${picked.runtime} min`]
                     .filter(Boolean)
                     .join(' · ')}
                 </div>
-                {seenBefore && <div className="rate__rewatch">再鑑賞として記録されます</div>}
+                {seenBefore && <div className="rate__rewatch">This will be logged as a rewatch</div>}
 
                 <div className="rate__stars">
                   <StarRating value={rating} onChange={setRating} size={44} />
@@ -201,7 +219,7 @@ export default function AddFlow({ entries, onSave, onClose }) {
 
                 <div className="rate__row">
                   <label>
-                    観た日
+                    Watched on
                     <input
                       type="date"
                       value={watchedOn}
@@ -228,14 +246,14 @@ export default function AddFlow({ entries, onSave, onClose }) {
                   className="rate__note"
                   rows={2}
                   value={note}
-                  placeholder="ひとこと（任意）"
+                  placeholder="Note (optional)"
                   onChange={(e) => setNote(e.target.value)}
                 />
 
                 {error && <p className="notice notice--error">{error}</p>}
 
                 <button className="primary" onClick={save} disabled={!rating || saving}>
-                  {saving ? '棚に入れています…' : rating ? '棚に入れる' : '★を付けてください'}
+                  {saving ? 'Adding to shelf…' : rating ? 'Add to shelf' : 'Rate it first'}
                 </button>
               </div>
             </div>

@@ -117,7 +117,7 @@ export default function Sky({ entries, selectedId, onSelect, justAddedId }) {
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
       >
-        <svg width="100%" height="100%" role="img" aria-label="観た映画の星図">
+        <svg width="100%" height="100%" role="img" aria-label="Star map of movies watched">
           <defs>
             {/* ★の色温度3段。個々の星ごとにグラデーションを持たせると重いので、
                 中心の点だけ正確な色にし、まわりのハローはこの3段で近似する */}
@@ -269,7 +269,7 @@ export default function Sky({ entries, selectedId, onSelect, justAddedId }) {
         {constellations.length > 0 && <span>constellations {constellations.length}</span>}
       </div>
 
-      {entries.length === 0 && <p className="empty empty--sky">空はまだ真っ暗です。</p>}
+      {entries.length === 0 && <p className="empty empty--sky">The sky is still dark.</p>}
     </div>
   )
 }

@@ -29,7 +29,7 @@ export const backend = hasFirebase ? 'firebase' : 'local'
 // こちらのほうがFirestoreのセキュリティルールが素直に書ける。
 function entriesCollection() {
   const uid = auth.currentUser?.uid
-  if (!uid) throw new Error('ログインしていません。')
+  if (!uid) throw new Error('You are not signed in.')
   return collection(db, 'users', uid, 'entries')
 }
 
@@ -87,7 +87,7 @@ export async function addEntry(entry) {
   }
 
   if (await existsSameDay(entry.tmdbId, entry.watchedOn)) {
-    throw new Error('その日付で同じ作品がすでに記録されています。')
+    throw new Error('This title is already logged for that date.')
   }
 
   const payload = { ...entry, createdAt: new Date().toISOString() }
@@ -95,7 +95,7 @@ export async function addEntry(entry) {
     const ref = await addDoc(entriesCollection(), payload)
     return { id: ref.id, ...payload }
   } catch (e) {
-    throw new Error(`保存に失敗しました: ${e.message}`)
+    throw new Error(`Failed to save: ${e.message}`)
   }
 }
 
@@ -110,7 +110,7 @@ export async function updateEntry(id, patch) {
     await updateDoc(doc(entriesCollection(), id), patch)
     return { id, ...patch }
   } catch (e) {
-    throw new Error(`更新に失敗しました: ${e.message}`)
+    throw new Error(`Failed to update: ${e.message}`)
   }
 }
 
@@ -122,7 +122,7 @@ export async function removeEntry(id) {
   try {
     await deleteDoc(doc(entriesCollection(), id))
   } catch (e) {
-    throw new Error(`削除に失敗しました: ${e.message}`)
+    throw new Error(`Failed to delete: ${e.message}`)
   }
 }
 

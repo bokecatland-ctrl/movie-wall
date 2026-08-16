@@ -514,9 +514,10 @@
   right: 12px;
 }
 .detail__poster img {
-  width: 132px;
-  border-radius: 3px;
+  width: 100%;
+  border-radius: 6px;
   border: 1px solid var(--rule);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.5);
   display: block;
 }
 .detail__title {
@@ -700,11 +701,49 @@
   display: flex;
   gap: 20px;
 }
+.rate__poster {
+  flex: none;
+  width: 180px;
+}
 .rate__poster img {
   width: 180px;
   border-radius: 3px;
   display: block;
 }
+
+/* 検索結果は1枚だけ選んで終わりだが、実際にはTMDBに何種類か
+   ポスターが登録されていることが多い。ここで選び直せるようにする */
+.poster-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+  width: 180px;
+}
+.poster-picker__item {
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 3px;
+  background: none;
+  width: 42px;
+  overflow: hidden;
+  opacity: 0.55;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+.poster-picker__item img {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  display: block;
+}
+.poster-picker__item:hover {
+  opacity: 0.85;
+}
+.poster-picker__item--on {
+  opacity: 1;
+  border-color: var(--accent);
+}
+
 .rate__main {
   flex: 1;
   min-width: 0;
@@ -1060,9 +1099,6 @@
   .app--detail .stage {
     padding-right: 0;
   }
-  .detail__poster img {
-    width: 104px;
-  }
 
   .sheet__body {
     max-height: 100vh;
@@ -1081,11 +1117,11 @@
     gap: 14px;
   }
   .rate__poster {
-    text-align: center;
-  }
-  .rate__poster img {
-    width: 140px;
+    /* 縦積みになった列の中で、固定幅のこの箱だけ中央寄せする */
     margin: 0 auto;
+  }
+  .poster-picker {
+    justify-content: center;
   }
 
   .fab {

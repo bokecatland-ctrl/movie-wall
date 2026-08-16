@@ -16,22 +16,22 @@ async function get(path, params = {}) {
   const data = await res.json().catch(() => ({}))
 
   if (res.status === 401) {
-    throw new Error('TMDBトークンが無効です。サーバの TMDB_TOKEN を確認してください。')
+    throw new Error('The TMDB token is invalid. Check TMDB_TOKEN on the server.')
   }
   if (res.status === 429) {
-    throw new Error('TMDBのレート制限に達しました。少し待ってから再試行してください。')
+    throw new Error('Hit the TMDB rate limit. Wait a moment and try again.')
   }
   if (!res.ok) {
-    throw new Error(data.error ?? `TMDBリクエスト失敗 (${res.status})`)
+    throw new Error(data.error ?? `TMDB request failed (${res.status})`)
   }
   return data
 }
 
 export const posterUrl = (path, size = 'w500') => (path ? `${IMG}/${size}${path}` : null)
 
-/** ポスター候補を「日本版 → 英語版 → 言語なし」の順に並べて返す */
+/** ポスター候補を「英語版 → 言語なし（テキストレス） → その他」の順に並べて返す */
 export function pickPosters(detail) {
-  const rank = (lang) => (lang === 'ja' ? 0 : lang === 'en' ? 1 : 2)
+  const rank = (lang) => (lang === 'en' ? 0 : lang == null ? 1 : 2)
   const fromImages = (detail?.images?.posters ?? [])
     .slice()
     .sort(
@@ -40,13 +40,8 @@ export function pickPosters(detail) {
     )
     .map((p) => p.file_path)
 
-  const unique = [...new Set([detail?.poster_path, ...fromImages].filter(Boolean))]
-
-  const jaFirst = fromImages.find(
-    (p) => detail.images.posters.find((x) => x.file_path === p)?.iso_639_1 === 'ja'
-  )
-  if (jaFirst) return [jaFirst, ...unique.filter((p) => p !== jaFirst)].slice(0, 12)
-  return unique.slice(0, 12)
+  // detail.poster_path は language=en-US で取っているので、既に英語版が来ている
+  return [...new Set([detail?.poster_path, ...fromImages].filter(Boolean))].slice(0, 12)
 }
 
 function pickCredits(detail) {
@@ -77,7 +72,7 @@ export async function fetchMovieEntry(tmdbId) {
   const detail = await get(`/movie/${tmdbId}`, {
     language: 'en-US',
     append_to_response: 'credits,images',
-    include_image_language: 'ja,en,null',
+    include_image_language: 'en,null,ja',
   })
 
   const posters = pickPosters(detail)

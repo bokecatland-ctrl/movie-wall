@@ -17,13 +17,13 @@ export function summarize(entries) {
   }
 }
 
-/** 「23日と4時間」。本数より、こちらの方が積み上がった実感が出る */
+/** 「23d 4h」。本数より、こちらの方が積み上がった実感が出る */
 export function formatDuration(minutes) {
-  if (!minutes) return '0時間'
+  if (!minutes) return '0h'
   const days = Math.floor(minutes / 1440)
   const hours = Math.floor((minutes % 1440) / 60)
-  if (days > 0) return `${days}日と${hours}時間`
-  return `${hours}時間${minutes % 60 ? `${minutes % 60}分` : ''}`
+  if (days > 0) return `${days}d ${hours}h`
+  return `${hours}h${minutes % 60 ? ` ${minutes % 60}m` : ''}`
 }
 
 /** 監督ごとの本数。多い順 */
