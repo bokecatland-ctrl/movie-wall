@@ -5,7 +5,6 @@ import {
   doc,
   getDocs,
   limit,
-  orderBy,
   query,
   updateDoc,
   where,
@@ -54,10 +53,16 @@ function localWrite(list) {
 export async function listEntries() {
   if (!hasFirebase) return localRead()
 
-  const snap = await getDocs(
-    query(entriesCollection(), orderBy('watchedOn', 'asc'), orderBy('createdAt', 'asc'))
-  )
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+  // watchedOn/createdAtの2段ソートをFirestore側に頼むと複合インデックスが要る
+  // （作っていないとクエリごと失敗し、保存はできるのに一覧だけ空に見える）。
+  // 個人用の規模なら並び替えはこちらでやれば十分で、インデックス管理が要らなくなる。
+  const snap = await getDocs(entriesCollection())
+  return snap.docs
+    .map((d) => ({ id: d.id, ...d.data() }))
+    .sort(
+      (a, b) =>
+        a.watchedOn.localeCompare(b.watchedOn) || (a.createdAt ?? '').localeCompare(b.createdAt ?? '')
+    )
 }
 
 /** 同じ日に同じ作品が既に記録されていないか。DBの一意制約が無いFirestoreでは自前で見る */
