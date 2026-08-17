@@ -1089,7 +1089,6 @@
 }
 .auth__form {
   display: grid;
-  gap: 10px;
   width: min(320px, 84vw);
   text-align: left;
 }
@@ -1101,6 +1100,51 @@
   font-size: 13px;
   color: var(--muted);
   line-height: 1.7;
+}
+
+/* Googleを主役に、メールリンクは控えめな保険として下に置く
+   （Firebase無料枠はメールリンクの送信数に1日の上限があるため） */
+.auth__google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--frame);
+  border-radius: 4px;
+  background: #fdfcfa;
+  color: #1f1f1f;
+  font-weight: 600;
+  font-size: 14px;
+}
+.auth__google:hover {
+  background: #eeece7;
+}
+
+.auth__divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+.auth__divider::before,
+.auth__divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+
+.auth__email {
+  display: grid;
+  gap: 10px;
+}
+.auth__email .ghost {
+  width: 100%;
+  padding: 11px;
 }
 
 /* ══ スマホ ════════════════════════════════════════ */
