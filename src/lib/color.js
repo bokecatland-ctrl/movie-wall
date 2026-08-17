@@ -79,6 +79,32 @@ function loadImage(src) {
   })
 }
 
+/** ピクセルを色相24×明度5のバケツに集計する。閾値を変えて2段階で使う */
+function collectBuckets(pixels, { lMin, lMax, sMin, weightBySaturation }) {
+  const buckets = new Map()
+  for (let i = 0; i < pixels.length; i += 4) {
+    const r = pixels[i]
+    const g = pixels[i + 1]
+    const b = pixels[i + 2]
+    if (pixels[i + 3] < 200) continue
+
+    const [h, s, l] = rgbToHsl(r, g, b)
+    if (l < lMin || l > lMax) continue
+    if (s < sMin) continue
+
+    const key = `${Math.floor(h * 24)}:${Math.floor(l * 5)}`
+    const acc = buckets.get(key) ?? { n: 0, r: 0, g: 0, b: 0, w: 0 }
+    const weight = weightBySaturation ? 1 + s * 2 : 1
+    acc.n += 1
+    acc.w += weight
+    acc.r += r * weight
+    acc.g += g * weight
+    acc.b += b * weight
+    buckets.set(key, acc)
+  }
+  return buckets
+}
+
 /**
  * 縮小してピクセルを量子化し、最頻色を採る。
  * 黒帯・白フチ・くすんだ背景は「その映画の色」ではないので票から外す。
@@ -107,28 +133,16 @@ export async function extractSpineColor(posterPath) {
     return FALLBACK
   }
 
-  const buckets = new Map()
-  for (let i = 0; i < pixels.length; i += 4) {
-    const r = pixels[i]
-    const g = pixels[i + 1]
-    const b = pixels[i + 2]
-    if (pixels[i + 3] < 200) continue
+  // 1段階目：「主張している色」を優先して拾う（黒帯・白フチ・ほぼグレーは除外）
+  let buckets = collectBuckets(pixels, { lMin: 0.07, lMax: 0.95, sMin: 0.15, weightBySaturation: true })
 
-    const [h, s, l] = rgbToHsl(r, g, b)
-    if (l < 0.12 || l > 0.92) continue // 黒帯と白フチ
-    if (s < 0.15) continue // ほぼグレー
-
-    // 色相を24分割、明度を5段。ここまで粗くしないと票が割れる
-    const key = `${Math.floor(h * 24)}:${Math.floor(l * 5)}`
-    const acc = buckets.get(key) ?? { n: 0, r: 0, g: 0, b: 0, w: 0 }
-    // 鮮やかな画素ほど重く数える（ポスターの「主張している色」を拾いたい）
-    const weight = 1 + s * 2
-    acc.n += 1
-    acc.w += weight
-    acc.r += r * weight
-    acc.g += g * weight
-    acc.b += b * weight
-    buckets.set(key, acc)
+  // 最近のポスターはティール&オレンジ系など、暗く沈んで彩度も低いグレーディングが
+  // 多く、1段階目だと全画素が足切りされて灰色フォールバックに落ちがちだった。
+  // その場合だけ彩度の足切りをほぼ外し、純粋な黒白でない画素の中から
+  // 一番多い色相を拾う（最終的な彩度は下でどのみち底上げするので、
+  // ここでは「わずかでも色味がある方向」さえ拾えれば十分）。
+  if (buckets.size === 0) {
+    buckets = collectBuckets(pixels, { lMin: 0.04, lMax: 0.97, sMin: 0.03, weightBySaturation: false })
   }
 
   if (buckets.size === 0) return FALLBACK

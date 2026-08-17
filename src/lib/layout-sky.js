@@ -24,14 +24,21 @@ function hash01(str) {
  * これが無いと星図は「ただの散布図」になって記憶に残らない。
  */
 export function starPosition(entry) {
-  const genre = entry.genres?.[0] ?? 'その他'
+  const genre = entry.genres?.[0] ?? 'Other'
   const j1 = seeded(entry.tmdbId)
   const j2 = seeded(entry.tmdbId * 7 + 13)
 
-  const angle = hash01(genre) * TAU + (j1 - 0.5) * 0.72
+  // 同じジャンルの作品が1本の細い線に固まって見えないよう、角度のばらつきを広めに取る
+  const angle = hash01(genre) * TAU + (j1 - 0.5) * 1.3
+
   const year = entry.releaseYear ?? 2000
-  const depth = Math.max(0, Math.min(1, (2030 - year) / 100)) // 1930〜2030
-  const radius = 170 + depth * 760 + (j2 - 0.5) * 90
+  const yearsAgo = Math.max(0, 2030 - year)
+  // 実際に観る映画は直近10〜20年に偏りやすく、単純な線形距離だと
+  // ほとんどの星が中心付近の狭い範囲に押し込まれて窮屈になる。
+  // 手前側（最近の作品）を伸ばす曲線をかけて、直近の年代でも十分な間隔が出るようにする。
+  const depthLinear = Math.min(1, yearsAgo / 70)
+  const depth = Math.pow(depthLinear, 0.62)
+  const radius = 190 + depth * 900 + (j2 - 0.5) * 130
 
   return { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius }
 }
