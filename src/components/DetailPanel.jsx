@@ -47,14 +47,14 @@ export default function DetailPanel({ entry, onUpdate, onRemove, onClose }) {
 
       {entry.director && (
         <p className="detail__credit">
-          <span>Director</span>
-          {entry.director}
+          <span className="detail__credit-label">Director</span>
+          <span className="detail__credit-value">{entry.director}</span>
         </p>
       )}
       {entry.castNames?.length > 0 && (
         <p className="detail__credit">
-          <span>Cast</span>
-          {entry.castNames.join(' / ')}
+          <span className="detail__credit-label">Cast</span>
+          <span className="detail__credit-value">{entry.castNames.join(' / ')}</span>
         </p>
       )}
       {entry.genres?.length > 0 && (

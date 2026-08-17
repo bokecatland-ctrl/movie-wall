@@ -11,9 +11,17 @@ export default function Shelf({ entries, sort, onSortChange, selectedId, onSelec
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    const ro = new ResizeObserver(([e]) => setWidth(e.contentRect.width))
+    // clientWidth はpaddingを含む。両端の側板は左右のpadding内に収めてあるので、
+    // ここでpaddingを引いた「本を並べられる実幅」を出しておけば、
+    // ブレークポイントでpaddingが変わっても側板と本が被らない
+    const measure = () => {
+      const cs = getComputedStyle(el)
+      const pad = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight)
+      setWidth(el.clientWidth - pad)
+    }
+    const ro = new ResizeObserver(measure)
     ro.observe(el)
-    setWidth(el.clientWidth)
+    measure()
     return () => ro.disconnect()
   }, [])
 
@@ -22,7 +30,7 @@ export default function Shelf({ entries, sort, onSortChange, selectedId, onSelec
   // 段ごとの累計本数も一緒に出しておく。棚を下に追うだけで増え方が読める
   const numbered = useMemo(() => {
     if (!width) return []
-    const shelves = buildShelves(sortEntries(entries, sort), width - 24, baseHeight)
+    const shelves = buildShelves(sortEntries(entries, sort), width, baseHeight)
     let running = 0
     return shelves.map((s) => {
       const from = running + 1
@@ -61,7 +69,7 @@ export default function Shelf({ entries, sort, onSortChange, selectedId, onSelec
                   x={it.x}
                   height={it.height}
                   // 右端の本をそのまま開くと表紙が画面外に出るので、左に開かせる
-                  flip={it.x + it.height * (2 / 3) > width - 24}
+                  flip={it.x + it.height * (2 / 3) > width}
                   selected={selectedId === it.entry.id}
                   justAdded={justAddedId === it.entry.id}
                   onSelect={onSelect}

@@ -128,47 +128,88 @@
 }
 
 .shelves {
-  padding: 8px 12px 120px;
+  position: relative;
+  padding: 8px 16px 120px;
+}
+/* 棚全体を左右から挟む側板。ケースの中に収まっている感じを出す */
+.shelves::before,
+.shelves::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 100px;
+  width: 7px;
+  background: linear-gradient(90deg, var(--plank-edge), var(--plank) 55%, var(--plank-edge));
+  box-shadow: 0 0 14px rgba(0, 0, 0, 0.4);
+  border-radius: 2px;
+  pointer-events: none;
+}
+.shelves::before {
+  left: 3px;
+}
+.shelves::after {
+  right: 3px;
 }
 
 .shelf {
-  margin-bottom: 26px;
+  margin-bottom: 22px;
 }
 
 .shelf__books {
   position: relative;
   height: calc(var(--h) * 1.1);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent 45%);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent 45%),
+    /* 本の足元が板に接する影。浮いて見えないようここで沈める */ linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.4),
+      transparent 7%
+    );
 }
 
+/* 木目調の板。上面（光が当たる薄い帯）と前面（陰になる本体）で厚みを出し、
+   粒状のテクスチャ（--grain）を薄く重ねて質感を足している */
 .shelf__plank {
   position: relative;
-  height: 13px;
-  background: linear-gradient(180deg, var(--plank-edge), var(--plank));
-  border-radius: 0 0 4px 4px;
+  height: 20px;
+  background-image: var(--grain), linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.3) 0%,
+      var(--plank-edge) 14%,
+      var(--plank-edge) 42%,
+      var(--plank) 42%,
+      var(--plank) 100%
+    );
+  background-size: 160px 160px, auto;
+  background-blend-mode: overlay, normal;
+  border-radius: 0 0 3px 3px;
   box-shadow:
-    0 8px 18px var(--plank-shadow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    0 12px 24px var(--plank-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.35);
 }
 
 .plate {
   position: absolute;
-  right: 8px;
+  right: 10px;
   top: 0;
   font-family: var(--font-cond);
   font-size: 10px;
-  line-height: 13px;
+  line-height: 20px;
   letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.34);
+  color: rgba(255, 255, 255, 0.4);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
   font-variant-numeric: tabular-nums;
 }
 .plate--brass {
-  top: -1px;
+  top: 2px;
+  line-height: 16px;
   padding: 1px 8px;
   color: #1d1405;
   background: linear-gradient(180deg, #eccd85, #a2802f);
   border-radius: 2px;
   font-weight: 700;
+  text-shadow: none;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
@@ -579,21 +620,24 @@
   font-size: 12px;
   color: var(--muted);
 }
+/* text-indentの負マージンで「ぶら下げインデント」を作っていたが、
+   Safari系で挙動が違いラベルが見えなくなる報告があったため、
+   同じ見た目をflexの2カラムで作り直した（こちらのほうが堅牢） */
 .detail__credit {
+  display: flex;
+  gap: 6px;
   margin: 0 0 4px;
   font-size: 12.5px;
-  /* キャストが長くて折り返っても、2行目が行頭に戻らず値の開始位置に揃う
-     （ぶら下げインデント。60pxのラベル幅+6pxの余白と合わせてある） */
-  padding-left: 66px;
-  text-indent: -66px;
 }
-.detail__credit span {
-  /* 固定幅だと "Director" が収まらず名前に被る。中身に合わせて伸びる列にする */
-  display: inline-block;
-  min-width: 60px;
-  margin-right: 6px;
+.detail__credit-label {
+  flex: none;
+  width: 60px;
   color: var(--muted);
   font-size: 11px;
+}
+.detail__credit-value {
+  flex: 1;
+  min-width: 0;
 }
 .detail__genres {
   display: flex;
@@ -1173,7 +1217,7 @@
   }
 
   .shelves {
-    padding: 6px 8px 140px;
+    padding: 6px 14px 140px;
   }
 
   /* 詳細は下からせり上がるシートにする */
