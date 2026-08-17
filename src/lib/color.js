@@ -69,7 +69,7 @@ export function hueKey(hex) {
   return s < 0.12 ? 1000 + h : h * 360
 }
 
-function loadImage(src) {
+function loadImageOnce(src) {
   return new Promise((resolve, reject) => {
     const img = new Image()
     img.crossOrigin = 'anonymous'
@@ -77,6 +77,27 @@ function loadImage(src) {
     img.onerror = () => reject(new Error('ポスターの読み込みに失敗しました'))
     img.src = src
   })
+}
+
+/**
+ * TMDBのCDNは瞬間的な取りこぼしがある（実測: 1回失敗しても直後の再試行は通る）。
+ * ここで諦めて灰色に倒すと、たまたま失敗しただけの映画がずっと同じ灰色に
+ * 固定されてしまうので、少し間を置いて2回までは再試行する。
+ * URLにクエリを足すとCDN側の挙動が変わりかねないので、素のURLのまま試す
+ * （失敗した画像読み込みはブラウザ側でも基本的にキャッシュされないので、
+ * new Image() を作り直すだけで実際にネットワークへ再度取りに行く）。
+ */
+async function loadImage(src, attempts = 3) {
+  let lastErr
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await loadImageOnce(src)
+    } catch (e) {
+      lastErr = e
+      if (i < attempts - 1) await new Promise((r) => setTimeout(r, 350 * (i + 1)))
+    }
+  }
+  throw lastErr
 }
 
 /** ピクセルを色相24×明度5のバケツに集計する。閾値を変えて2段階で使う */

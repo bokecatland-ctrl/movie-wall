@@ -16,6 +16,11 @@ function hash01(str) {
   return ((h >>> 0) % 10000) / 10000
 }
 
+/** そのジャンルが担当する「基準の方角」。コンパス表示にも同じ値を使う */
+export function genreAngle(genre) {
+  return hash01(genre) * TAU
+}
+
 /**
  * 星の位置。
  *   角度 = ジャンル（同じジャンルが空の同じ方角に集まる）
@@ -29,7 +34,7 @@ export function starPosition(entry) {
   const j2 = seeded(entry.tmdbId * 7 + 13)
 
   // 同じジャンルの作品が1本の細い線に固まって見えないよう、角度のばらつきを広めに取る
-  const angle = hash01(genre) * TAU + (j1 - 0.5) * 1.3
+  const angle = genreAngle(genre) + (j1 - 0.5) * 1.3
 
   const year = entry.releaseYear ?? 2000
   const yearsAgo = Math.max(0, 2030 - year)

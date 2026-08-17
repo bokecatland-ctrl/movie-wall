@@ -4,6 +4,7 @@ import {
   buildFieldStars,
   buildStars,
   fitView,
+  genreAngle,
   starLook,
 } from '../lib/layout-sky.js'
 
@@ -29,6 +30,13 @@ export default function Sky({ entries, selectedId, onSelect, justAddedId }) {
   const constellations = useMemo(() => buildConstellations(stars), [stars])
   // データと無関係の遠景の星。シード固定なので毎回同じ夜空になる
   const fieldStars = useMemo(() => buildFieldStars(), [])
+  // どの方角が何ジャンルか。パン/ズームは回転を含まないので、
+  // コンパスは画面固定のオーバーレイとして出せる（世界座標に追従させる必要が無い）
+  const compassGenres = useMemo(() => {
+    const set = new Set()
+    for (const s of stars) set.add(s.entry.genres?.[0] ?? 'Other')
+    return [...set].sort()
+  }, [stars])
 
   useEffect(() => {
     const el = ref.current
@@ -105,6 +113,8 @@ export default function Sky({ entries, selectedId, onSelect, justAddedId }) {
   }
 
   const litIds = hovered ? constellations.find((c) => c.name === hovered)?.ids : null
+  // ラベル分の余白を確保しつつ、コンテナに収まる大きさに
+  const compassRadius = Math.max(0, Math.min(size.w, size.h) / 2 - 34)
 
   return (
     <div className="sky-view">
@@ -259,6 +269,49 @@ export default function Sky({ entries, selectedId, onSelect, justAddedId }) {
               )
             })}
           </g>
+
+          {/* ジャンル方位コンパス。パン/ズームは回転しないので画面に固定したまま出せる。
+              自分の持っているジャンルだけを表示する（TMDBの全ジャンルを出すと窮屈になる） */}
+          {size.w > 0 && (
+            <g className="sky-compass" aria-hidden="true">
+              <circle
+                cx={size.w / 2}
+                cy={size.h / 2}
+                r={compassRadius}
+                fill="none"
+                stroke="var(--sky-line)"
+                strokeDasharray="2 7"
+              />
+              {compassGenres.map((g) => {
+                const a = genreAngle(g)
+                const cos = Math.cos(a)
+                const sin = Math.sin(a)
+                const cx = size.w / 2
+                const cy = size.h / 2
+                return (
+                  <g key={g}>
+                    <line
+                      x1={cx + cos * (compassRadius - 9)}
+                      y1={cy + sin * (compassRadius - 9)}
+                      x2={cx + cos * compassRadius}
+                      y2={cy + sin * compassRadius}
+                      stroke="var(--sky-line)"
+                      strokeWidth="1.2"
+                    />
+                    <text
+                      x={cx + cos * (compassRadius + 13)}
+                      y={cy + sin * (compassRadius + 13)}
+                      className="sky-compass__label"
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                    >
+                      {g}
+                    </text>
+                  </g>
+                )
+              })}
+            </g>
+          )}
         </svg>
       </div>
 
