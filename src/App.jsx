@@ -158,6 +158,12 @@ export default function App() {
                 {hasFirebase && <button onClick={() => signOut(auth)}>Log out</button>}
                 <p className="menu__note">
                   Storage: {hasFirebase ? 'Firebase (synced across devices)' : 'This browser only'}
+                  {hasFirebase && user?.email && (
+                    <>
+                      <br />
+                      Signed in as {user.email}
+                    </>
+                  )}
                 </p>
               </div>
             </>
