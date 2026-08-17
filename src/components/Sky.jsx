@@ -4,7 +4,7 @@ import {
   buildFieldStars,
   buildStars,
   fitView,
-  genreAngle,
+  genreArrow,
   starLook,
 } from '../lib/layout-sky.js'
 
@@ -113,8 +113,6 @@ export default function Sky({ entries, selectedId, onSelect, justAddedId }) {
   }
 
   const litIds = hovered ? constellations.find((c) => c.name === hovered)?.ids : null
-  // ラベル分の余白を確保しつつ、コンテナに収まる大きさに
-  const compassRadius = Math.max(0, Math.min(size.w, size.h) / 2 - 34)
 
   return (
     <div className="sky-view">
@@ -269,55 +267,26 @@ export default function Sky({ entries, selectedId, onSelect, justAddedId }) {
               )
             })}
           </g>
-
-          {/* ジャンル方位コンパス。パン/ズームは回転しないので画面に固定したまま出せる。
-              自分の持っているジャンルだけを表示する（TMDBの全ジャンルを出すと窮屈になる） */}
-          {size.w > 0 && (
-            <g className="sky-compass" aria-hidden="true">
-              <circle
-                cx={size.w / 2}
-                cy={size.h / 2}
-                r={compassRadius}
-                fill="none"
-                stroke="var(--sky-line)"
-                strokeDasharray="2 7"
-              />
-              {compassGenres.map((g) => {
-                const a = genreAngle(g)
-                const cos = Math.cos(a)
-                const sin = Math.sin(a)
-                const cx = size.w / 2
-                const cy = size.h / 2
-                return (
-                  <g key={g}>
-                    <line
-                      x1={cx + cos * (compassRadius - 9)}
-                      y1={cy + sin * (compassRadius - 9)}
-                      x2={cx + cos * compassRadius}
-                      y2={cy + sin * compassRadius}
-                      stroke="var(--sky-line)"
-                      strokeWidth="1.2"
-                    />
-                    <text
-                      x={cx + cos * (compassRadius + 13)}
-                      y={cy + sin * (compassRadius + 13)}
-                      className="sky-compass__label"
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                    >
-                      {g}
-                    </text>
-                  </g>
-                )
-              })}
-            </g>
-          )}
         </svg>
+
+        {/* ジャンル方位の凡例。画面の隅に固定した小さいパネルにしてある——
+            星図の中心にリング状に置くと、パンした瞬間に「中心」がズレて
+            意味を失う上、ドラッグ操作でテキスト選択も起きて煩わしかったため */}
+        {compassGenres.length > 0 && (
+          <div className="sky-compass" aria-hidden="true">
+            {compassGenres.map((g) => (
+              <span key={g} className="sky-compass__item">
+                <span className="sky-compass__arrow">{genreArrow(g)}</span>
+                {g}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="sky-legend">
         <span>brightness = rating</span>
-        <span>direction = genre</span>
+        <span>direction = genre (see corner)</span>
         <span>distance = release year</span>
         {constellations.length > 0 && <span>constellations {constellations.length}</span>}
       </div>

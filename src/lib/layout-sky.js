@@ -21,6 +21,17 @@ export function genreAngle(genre) {
   return hash01(genre) * TAU
 }
 
+const ARROWS = ['→', '↘', '↓', '↙', '←', '↖', '↑', '↗']
+
+/**
+ * 角度を8方位の矢印に丸める。
+ * SVGはy軸が下向きなので、angle=0が→、増えるほど時計回りに回る。
+ */
+export function genreArrow(genre) {
+  const a = ((genreAngle(genre) % TAU) + TAU) % TAU
+  return ARROWS[Math.round(a / (TAU / 8)) % 8]
+}
+
 /**
  * 星の位置。
  *   角度 = ジャンル（同じジャンルが空の同じ方角に集まる）

@@ -421,6 +421,12 @@
 .sky:active {
   cursor: grabbing;
 }
+/* ドラッグしてパンしているだけなのに星や星座のラベル文字が
+   選択されて青くハイライトされるのを防ぐ */
+.sky {
+  user-select: none;
+  -webkit-user-select: none;
+}
 
 /* 星雲。パン/ズームの座標系の外にある固定の書き割りなので、
    手前の星だけが動く分だけ勝手に奥行きが出る（安上がりなパララックス）。 */
@@ -522,26 +528,45 @@
   flex-wrap: wrap;
 }
 
-/* ジャンル方位コンパス。星と違ってパン/ズームで動かない固定オーバーレイなので、
-   紛らわしくないよう控えめな線と文字にしてある */
-.sky-compass circle {
-  fill: none;
-  stroke: var(--sky-line);
-  stroke-width: 1;
-  opacity: 0.35;
-}
-.sky-compass line {
-  opacity: 0.5;
-}
-.sky-compass__label {
-  fill: #9fb2dd;
+/* ジャンル方位の凡例。円環でリング表示すると、パン/ズームで「中心」が
+   ズレて意味を失う上、SVGのtextはドラッグで選択もされて煩わしかったので、
+   画面の隅に固定した小さな一覧に変えた。星図の中身とは無関係の
+   UIなので、内容と混ざらないよう控えめにしている */
+.sky-compass {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  z-index: 3;
+  display: grid;
+  gap: 3px;
+  padding: 8px 10px;
+  max-width: 132px;
+  max-height: calc(100% - 20px);
+  overflow-y: auto;
+  background: rgba(10, 10, 15, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   font-family: var(--font-cond);
-  font-size: 11px;
-  letter-spacing: 0.03em;
-  paint-order: stroke;
-  stroke: rgba(0, 0, 0, 0.85);
-  stroke-width: 3px;
-  pointer-events: none;
+  font-size: 10.5px;
+  color: #9fb2dd;
+  /* パンしようとしてここを掴んでも、文字が選択されて青くならないように */
+  user-select: none;
+  -webkit-user-select: none;
+}
+.sky-compass__item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sky-compass__arrow {
+  flex: none;
+  width: 1.1em;
+  color: var(--muted);
 }
 
 .empty--sky {
